@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: httpd-applicationset
+  namespace: argocd
+
+spec:
+  generators:
+  - list:
+      elements:
+      - env: dev
+      - env: qa
+      - env: prod
+
+  template:
+    metadata:
+      name: 'httpd-{{env}}'
+
+    spec:
+      project: default
+
+      source:
+        repoURL: https://github.com/mandu1234567/kubernetes.git
+        targetRevision: HEAD
+        path: day-5-application-set/app
+
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{env}}'
+
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
